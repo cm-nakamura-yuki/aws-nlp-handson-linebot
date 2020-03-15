@@ -2,7 +2,11 @@
 ## LINE Botを作成する
 このLINE Botではテキスト送信、音声送信を受け付けることができます。テキスト送信する場合は英語で送信してみてください。Amazon Translateを使い、日本語へ翻訳したテキストを返します。[the japan times alpha](https://alpha.japantimes.co.jp/) などを利用すると和訳も読むことができます。こちらのテキストを送信することでAmazon Translateのパワーを確認できるはずです。  
 
+![sample-1](sample-1.png)
+
 音声送信の場合は、日本語でLINE Botに話しかけてみてください。音声をS3にアップロードして音声文字起こしを開始します。文字起こしが完了するとテキストがLINE Botに送信されます。
+
+![sample-2](sample-2.png)
 
 ### LINE Developers
 LINE Botを作成するために、LINE Developersへの登録が必要となります。
@@ -64,5 +68,7 @@ LINE Botから送信される音声を保存するS3バケットを作成しま�
 ![s3-3](./images/s3-3.png)
 
 ### AWS Lambda
+
+
 
 ### Amazon API Gateway

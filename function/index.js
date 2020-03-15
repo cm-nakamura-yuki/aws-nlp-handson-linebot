@@ -43,7 +43,7 @@ exports.handler = async(event) => {
             let text;
             if (messages.events[i].message.type === 'text') {
                 const param = {
-                    SourceLanguageCode: 'auto',
+                    SourceLanguageCode: 'en',
                     TargetLanguageCode: 'ja',
                     Text: messages.events[i].message.text
                 };

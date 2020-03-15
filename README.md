@@ -116,3 +116,15 @@ API Gatewayを開き、HTTP APIの構築をクリックします。
 作成が完了すると、一覧からAPIの詳細を確認できます。ステージセクションにAPIのURLが表示されていますのでメモしておいてください。実際のリクエストするURLはURL + /webhookとなります。
 
 ![api-7](./images/api-7.png)
+
+### LINE Developersと疎通
+作成したAPIとLINE Botを疎通していきます。先ほどチャネルアクセストークンを取得した、チャネルのMessaging API設定に移動します。スクロールするとWebhook設定セクションがあるので、編集ボタンをクリックし先ほどのAPI URL + /webhookを入力して保存します。検証ボタンをクリックすることで、APIが正常に動いているか確認できます。検証がOKになりましたら、Webhookの利用をオンにします。
+
+![line2-1](./images/line2-1.png)
+
+これでWebhookの設定は完了ですが、まだLINE公式アカウントが自動応答しているので、無効化します。LINE公式アカウント機能の応答メッセージを編集をクリックします。クリックするとLINE Official Account Managerに遷移します。応答設定 > 詳細設定 > 応答メッセージをオフにします。
+
+![line2-3](./images/line2-3.png)
+![line2-4](./images/line2-4.png)
+
+これで公式アカウントからメッセージを送信すると作成したAPIにリクエストが飛び、処理を実行します。公式アカウントと友だちになるにはLINE Developersコンソール > チャネル > Messaging API設定内に表示されているQRコードをスマートフォンで読み込んでください。

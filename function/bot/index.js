@@ -59,6 +59,7 @@ exports.handler = async(event) => {
                     Key: `${messages.events[i].source.userId}_${messages.events[i].message.id}.mp4`
                 };
                 const result = await s3.putObject(param).promise();
+                console.log(JSON.stringify(result));
                 text = [{
                     type: 'text',
                     text: 'アップロードしました、音声を解析中です。'

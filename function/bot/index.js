@@ -56,7 +56,7 @@ exports.handler = async(event) => {
                 const param = {
                     Body: await getContent(messages.events[i].message.id),
                     Bucket: process.env.TRANSCRIBE_BUCKET_NAME,
-                    Key: `${messages.events[i].message.id}.mp4`
+                    Key: `${messages.events[i].source.userId}_${messages.events[i].message.id}.mp4`
                 };
                 const result = await s3.putObject(param).promise();
                 text = [{

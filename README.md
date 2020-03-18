@@ -1,4 +1,6 @@
 # はじめての自然言語処理（NLP：Natural Language Processing）ハンズオン
+======
+
 ## LINE Botを作成する
 このLINE Botではテキスト送信、音声送信を受け付けることができます。テキスト送信する場合は英語で送信してみてください。Amazon Translateを使い、日本語へ翻訳したテキストを返します。[the japan times alpha](https://alpha.japantimes.co.jp/) などを利用すると和訳も読むことができます。こちらのテキストを送信することでAmazon Translateのパワーを確認できるはずです。  
 
@@ -36,25 +38,26 @@ Lambda用のロールを作成するので、サービスでLambdaを選択し�
 
 ![iam-2](./images/iam-2.png)
 
-LambdaからAmazon Translate, Amazon S3, Amazon CloudWatch Logsへアクセスが必要なのでポリシーを選択し次のステップ：タグをクリックしてください。
-追加するポリシーはAWSのマネージドポリシーを利用します。
+LambdaからAmazon Translate, Amazon S3, Amazon CloudWatch Logs, Amazon Transcribeへアクセスが必要なのでポリシーを選択し次のステップ：タグをクリックしてください。追加するポリシーはAWSのマネージドポリシーを利用します。
 
-* TranslateFullAccess
-* AmazonS3FullAccess
-* CloudWatchLogsFullAccess
+- TranslateFullAccess
+- AmazonS3FullAccess
+- CloudWatchLogsFullAccess
+- AmazonTranscribeFullAccess
 
 ![iam-3](./images/iam-3.png)
 ![iam-4](./images/iam-4.png)
 ![iam-5](./images/iam-5.png)
+![iam-7](./images/iam-7.png)
 ![iam-6](./images/iam-6.png)
 
 タグの設定はスキップし、作成するロールの確認後ロールの作成をクリックします。ロールが正常に作成されるとメッセージが表示されます。
 
-![iam-7](./images/iam-7.png)
 ![iam-8](./images/iam-8.png)
+![iam-9](./images/iam-9.png)
 
 ### Amazon S3
-LINE Botから送信される音声を保存するS3バケットを作成します。Amazon S3にアクセスし、バケットを作成するをクリックしてください。
+LINE Botから送信される音声を保存するS3バケットとAmazon Transcribeの結果を保存するS3バケットを作成します。Amazon S3にアクセスし、バケットを作成するをクリックしてください。
 
 ![s3-1](./images/s3-1.png)
 
@@ -66,9 +69,10 @@ LINE Botから送信される音声を保存するS3バケットを作成しま�
 
 ![s3-3](./images/s3-3.png)
 
-バケット名は後ほどLambdaの設定で利用するのでメモしておいてください。
+上記の作業を2回行い2つのバケットを作成してください。またバケット名は後ほどLambdaの設定で利用するのでメモしておいてください。
 
 ### Lambda
+#### LINE Bot用Lambda
 Lambda > 関数にアクセスし関数の作成をクリックしてください。
 
 ![lambda-1](./images/lambda-1.png)
@@ -83,16 +87,51 @@ Lambda > 関数にアクセスし関数の作成をクリックしてくださ�
 
 ![lambda-5](./images/lambda-5.png)
 
-次に基本設定、環境変数を修正します。スクロールしていくと下に該当のセクションがあります。まずは基本設定のタイムアウトを伸ばします。これは外部APIコールによる音声データの取得、S3への保存処理があるためです。環境変数はチャネルシークレット、チャネルアクセストークン、S3バケット名を外部から渡すために使用します。先ほどメモしておいたそれぞれをキーと値を保存します。
+次に基本設定、環境変数を修正します。スクロールしていくと下に該当のセクションがあります。まずは基本設定のタイムアウトを10秒に伸ばします。これは外部APIコールによる音声データの取得、S3への保存処理があるためです。環境変数はチャネルシークレット、チャネルアクセストークン、S3バケット名を外部から渡すために使用します。先ほどメモしておいたそれぞれをキーと値を保存します。
 
 変数名|説明
 ---|---
 CHANNEL_ACCESS_TOKEN|チャネルアクセストークン（ロングターム）
 CHANNEL_SECRET|チャネルシークレット
-TRANSCRIBE_BUCKET_NAME|S3バケット名
+TRANSCRIBE_BUCKET_NAME|音声ファイル保存先S3バケット名
 
 ![lambda-6](./images/lambda-6.png)
 ![lambda-7](./images/lambda-7.png)
+
+#### Amazon Transcribe用Lambda
+先ほどと同じフローでLambda関数を作成します。作成が完了したら基本設定のタイムアウトを10秒に伸ばし、環境変数を設定します。この関数では、Amazon Transcribeで文字起こしした結果を保存する先を設定します。先ほど作成したバケットで音声ファイル保存先に使っていない方を登録してください。
+
+変数名|説明
+---|---
+OUTPUT_BUCKET|文字起こしした結果保存先S3バケット名
+
+![lambda-8](./images/lambda-8.png)
+
+ここまで完成したらLambdaを実際に動かすトリガーを設定します。LambdaのDesignerが表示されていると思いますので、トリガーを追加をクリックしてください。プルダウンが表示されますので、スクロールしてS3を選択します。
+
+![lambda-9](./images/lambda-9.png)
+![lambda-10](./images/lambda-10.png)
+
+詳細設定が表示されますので、まずはバケットに音声ファイル保存先S3バケットを選択します。そしてサフィックスに.mp4を入力し追加をクリックで保存してください。
+
+![lambda-11](./images/lambda-11.png)
+
+Lambda Designerのページが表示され、トリガー追加に成功したメッセージと共にトリガーにS3が表示されていると思います。
+
+![lambda-12](./images/lambda-12.png)
+
+#### プッシュ通知用Lambda
+先ほどと同じフローでLambda関数を作成します。作成が完了したら基本設定のタイムアウトを10秒に伸ばし、環境変数を設定します。
+
+変数名|説明
+---|---
+CHANNEL_ACCESS_TOKEN|チャネルアクセストークン（ロングターム）
+
+![lambda-13](./images/lambda-13.png)
+
+Amazon Transcribeの文字起こし結果がS3にJSONで保存されるように設定してますので、先ほどと同様とトリガーを設定します。まずはバケットに文字起こしした結果保存先S3バケットを選択します。サフィックスに.jsonを入力し追加をクリックで保存してください。
+
+![lambda-14](./images/lambda-14.png)
 
 ### Amazon API Gateway
 API Gatewayを開き、HTTP APIの構築をクリックします。

@@ -61,7 +61,15 @@ LINE Botから送信される音声を保存するS3バケットとAmazon Transc
 
 ![s3-1](./images/s3-1.png)
 
-バケットを作成するをクリック、任意のバケット名を入力し作成をクリックしてください。
+バケットを作成するをクリック、下記のバケット名を入力し作成をクリックしてください。バケット名は、全リージョンでユニークな名前である必要がありますので利用しているAWSアカウントIDをバケット名に追加する形でご用意ください。利用しているAWSアカウントIDはマネジメントコンソール右上部のタブから確認ができます。
+
+![aws-mc](./images/aws.png) 
+
+バケット名|説明
+---|---
+transcribe-input-${AWSAccountID}|音声データを保存するS3バケット
+transcribe-output-${AWSAccountID}|Amazon Transcribeの結果を保存するS3バケット
+
 
 ![s3-2](./images/s3-2.png)
 
@@ -79,11 +87,11 @@ Lambda > 関数にアクセスし関数の作成をクリックしてくださ�
 ![lambda-2](./images/lambda-2.png)
 ![lambda-3](./images/lambda-3.png)
 
-基本設定をしていきます、関数名は任意の名前を入力してください。ランタイムは、Node.js 12.xを、アクセス権限は既存のロールを使用するを選択し、先ほど作成したIAMロールをプルダウンから選んで関数の作成をクリックします。
+基本設定をしていきます、関数名は`bot`としてください。ランタイムは、Node.js 12.xを、アクセス権限は既存のロールを使用するを選択し、先ほど作成したIAMロールをプルダウンから選んで関数の作成をクリックします。
 
 ![lambda-4](./images/lambda-4.png)
 
-作成が完了したらコードをデプロイしていきます。関数コードのセクションからコードエントリータイプを.zipファイルをアップロードにし、アップロードをクリックしてfunction.zipをアップロードし保存します。
+作成が完了したらコードをデプロイしていきます。関数コードのセクションからコードエントリータイプを.zipファイルをアップロードにし、アップロードをクリックして`bot.zip`をアップロードし保存します。
 
 ![lambda-5](./images/lambda-5.png)
 
@@ -93,17 +101,17 @@ Lambda > 関数にアクセスし関数の作成をクリックしてくださ�
 ---|---
 CHANNEL_ACCESS_TOKEN|チャネルアクセストークン（ロングターム）
 CHANNEL_SECRET|チャネルシークレット
-TRANSCRIBE_BUCKET_NAME|音声ファイル保存先S3バケット名
+TRANSCRIBE_BUCKET_NAME|音声ファイル保存先S3バケット名、transcribe-input-${AWSAccountID}
 
 ![lambda-6](./images/lambda-6.png)
 ![lambda-7](./images/lambda-7.png)
 
 #### Amazon Transcribe用Lambda
-先ほどと同じフローでLambda関数を作成します。作成が完了したら基本設定のタイムアウトを10秒に伸ばし、環境変数を設定します。この関数では、Amazon Transcribeで文字起こしした結果を保存する先を設定します。先ほど作成したバケットで音声ファイル保存先に使っていない方を登録してください。
+先ほどと同じフローでLambda関数を作成します。関数名は、`startTranscribe`としてください。アップロードするzipファイルは、`startTranscribe.zip`です。作成が完了したら基本設定のタイムアウトを10秒に伸ばし、環境変数を設定します。この関数では、Amazon Transcribeで文字起こしした結果を保存する先を設定します。先ほど作成したバケットで音声ファイル保存先に使っていない方を登録してください。
 
 変数名|説明
 ---|---
-OUTPUT_BUCKET|文字起こしした結果保存先S3バケット名
+OUTPUT_BUCKET|文字起こしした結果保存先S3バケット名、transcribe-output-${AWSAccountID}
 
 ![lambda-8](./images/lambda-8.png)
 
@@ -121,7 +129,7 @@ Lambda Designerのページが表示され、トリガー追加に成功した�
 ![lambda-12](./images/lambda-12.png)
 
 #### プッシュ通知用Lambda
-先ほどと同じフローでLambda関数を作成します。作成が完了したら基本設定のタイムアウトを10秒に伸ばし、環境変数を設定します。
+先ほどと同じフローでLambda関数を作成します。関数名は、`push`としてください。アップロードするzipファイルは、`push.zip`です。作成が完了したら基本設定のタイムアウトを10秒に伸ばし、環境変数を設定します。
 
 変数名|説明
 ---|---

@@ -67,8 +67,8 @@ LINE Botから送信される音声を保存するS3バケットとAmazon Transc
 
 バケット名|説明
 ---|---
-transcribe-input-${AWSAccountID}|音声データを保存するS3バケット
-transcribe-output-${AWSAccountID}|Amazon Transcribeの結果を保存するS3バケット
+`transcribe-input-${AWSAccountID}`|音声データを保存するS3バケット
+`transcribe-output-${AWSAccountID}`|Amazon Transcribeの結果を保存するS3バケット
 
 
 ![s3-2](./images/s3-2.png)
@@ -101,7 +101,7 @@ Lambda > 関数にアクセスし関数の作成をクリックしてくださ�
 ---|---
 CHANNEL_ACCESS_TOKEN|チャネルアクセストークン（ロングターム）
 CHANNEL_SECRET|チャネルシークレット
-TRANSCRIBE_BUCKET_NAME|音声ファイル保存先S3バケット名、transcribe-input-${AWSAccountID}
+TRANSCRIBE_BUCKET_NAME|音声ファイル保存先S3バケット名、`transcribe-input-${AWSAccountID}`
 
 ![lambda-6](./images/lambda-6.png)
 ![lambda-7](./images/lambda-7.png)
@@ -111,7 +111,7 @@ TRANSCRIBE_BUCKET_NAME|音声ファイル保存先S3バケット名、transcribe
 
 変数名|説明
 ---|---
-OUTPUT_BUCKET|文字起こしした結果保存先S3バケット名、transcribe-output-${AWSAccountID}
+OUTPUT_BUCKET|文字起こしした結果保存先S3バケット名、`transcribe-output-${AWSAccountID}`
 
 ![lambda-8](./images/lambda-8.png)
 

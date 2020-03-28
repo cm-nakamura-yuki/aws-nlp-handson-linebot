@@ -1,16 +1,26 @@
 # はじめての自然言語処理（NLP：Natural Language Processing）ハンズオン
 
+## 資料
+資料についてはクローンするかzipファイルでダウンロードしてください。
+
+![github](./images/github.png)
+
 ## LINE Botを作成する
 このLINE Botではテキスト送信、音声送信を受け付けることができます。テキスト送信する場合は英語で送信してみてください。Amazon Translateを使い、日本語へ翻訳したテキストを返します。[the japan times alpha](https://alpha.japantimes.co.jp/) などを利用すると和訳も読むことができます。こちらのテキストを送信することでAmazon Translateのパワーを確認できるはずです。  
 
-## 構成図
-![st](./images/st.png)
+### 期待されるアウトプット
+**英語のテキストを送信すると日本語化したテキストが返信される**
 
 ![sample-1](./images/sample-1.png)
 
-音声送信の場合は、日本語でLINE Botに話しかけてみてください。音声をAmazon S3にアップロードして音声文字起こしを開始します。文字起こしが完了するとテキストがLINE Botに送信されます。
+**日本語の音声を送信すると文字起こしした日本語テキストが返信される**
 
 ![sample-2](./images/sample-2.png)
+
+### 利用するAWSサービス・仕組み
+このハンズオンは全て東京リージョンにて行います。
+
+![aws-structure](./images/st.png)
 
 ### LINE Developers
 LINE Botを作成するために、LINE Developersへの登録が必要となります。
@@ -48,14 +58,19 @@ LambdaからAmazon Translate, Amazon S3, Amazon CloudWatch Logs, Amazon Transcri
 - AmazonTranscribeFullAccess
 
 ![iam-3](./images/iam-3.png)
+
 ![iam-4](./images/iam-4.png)
+
 ![iam-5](./images/iam-5.png)
+
 ![iam-7](./images/iam-7.png)
+
 ![iam-6](./images/iam-6.png)
 
 タグの設定はスキップし、作成するロールの確認後ロールの作成をクリックします。ロールが正常に作成されるとメッセージが表示されます。
 
 ![iam-8](./images/iam-8.png)
+
 ![iam-9](./images/iam-9.png)
 
 ### Amazon S3
@@ -72,7 +87,6 @@ LINE Botから送信される音声を保存するS3バケットとAmazon Transc
 `transcribe-input-${AWSAccountID}`|音声データを保存するS3バケット
 `transcribe-output-${AWSAccountID}`|Amazon Transcribeの結果を保存するS3バケット
 
-
 ![s3-2](./images/s3-2.png)
 
 作成が完了すると、バケット一覧にバケット名が表示されます。
@@ -86,7 +100,9 @@ LINE Botから送信される音声を保存するS3バケットとAmazon Transc
 Lambda > 関数にアクセスし関数の作成をクリックしてください。
 
 ![lambda-1](./images/lambda-1.png)
+
 ![lambda-2](./images/lambda-2.png)
+
 ![lambda-3](./images/lambda-3.png)
 
 基本設定をしていきます、関数名は`bot`としてください。ランタイムは、Node.js 12.xを、アクセス権限は既存のロールを使用するを選択し、先ほど作成したIAMロールをプルダウンから選んで関数の作成をクリックします。
@@ -106,10 +122,11 @@ CHANNEL_SECRET|チャネルシークレット
 TRANSCRIBE_BUCKET_NAME|音声ファイル保存先S3バケット名、`transcribe-input-${AWSAccountID}`
 
 ![lambda-6](./images/lambda-6.png)
+
 ![lambda-7](./images/lambda-7.png)
 
 #### Amazon Transcribe用Lambda
-先ほどと同じフローでLambda関数を作成します。関数名は、`startTranscribe`としてください。アップロードするzipファイルは、`startTranscribe.zip`です。作成が完了したら基本設定のタイムアウトを10秒に伸ばし、環境変数を設定します。この関数では、Amazon Transcribeで文字起こしした結果を保存する先を設定します。先ほど作成したバケットで音声ファイル保存先に使っていない方を登録してください。
+先ほどと同じフローでLambda関数を作成します。関数名は、`startTranscribe`としてください。アップロードするzipファイルは、`startTranscribe.zip`です。作成が完了したら基本設定のタイムアウトを10秒に伸ばし、環境変数を設定します。この関数では、Amazon Transcribeで文字起こしした結果を保存する先を設定します。先ほど作成したバケットで音声ファイル保存先に使っていない方（`transcribe-output-${AWSAccountID}`）を登録してください。
 
 変数名|説明
 ---|---
@@ -120,9 +137,10 @@ OUTPUT_BUCKET|文字起こしした結果保存先S3バケット名、`transcrib
 ここまで完成したらLambdaを実際に動かすトリガーを設定します。LambdaのDesignerが表示されていると思いますので、トリガーを追加をクリックしてください。プルダウンが表示されますので、スクロールしてS3を選択します。
 
 ![lambda-9](./images/lambda-9.png)
+
 ![lambda-10](./images/lambda-10.png)
 
-詳細設定が表示されますので、まずはバケットに音声ファイル保存先S3バケットを選択します。そしてサフィックスに.mp4を入力し追加をクリックで保存してください。
+詳細設定が表示されますので、まずはバケットに音声ファイル保存先S3バケット（`transcribe-input-${AWSAccountID}`）を選択します。そしてサフィックスに.mp4を入力し追加をクリックで保存してください。
 
 ![lambda-11](./images/lambda-11.png)
 
@@ -139,7 +157,7 @@ CHANNEL_ACCESS_TOKEN|チャネルアクセストークン（ロングターム�
 
 ![lambda-13](./images/lambda-13.png)
 
-Amazon Transcribeの文字起こし結果がS3にJSONで保存されるように設定してますので、先ほどと同様とトリガーを設定します。まずはバケットに文字起こしした結果保存先S3バケットを選択します。サフィックスに.jsonを入力し追加をクリックで保存してください。
+Amazon Transcribeの文字起こし結果がS3にJSONで保存されるように設定してますので、先ほどと同様とトリガーを設定します。まずはバケットに文字起こしした結果保存先S3バケット（`transcribe-output-${AWSAccountID}`）を選択します。サフィックスに.jsonを入力し追加をクリックで保存してください。
 
 ![lambda-14](./images/lambda-14.png)
 
@@ -147,6 +165,7 @@ Amazon Transcribeの文字起こし結果がS3にJSONで保存されるように
 API Gatewayを開き、HTTP APIの構築をクリックします。
 
 ![api-1](./images/api-1.png)
+
 ![api-2](./images/api-2.png)
 
 統合タイプをLambdaにし、作成したリージョン・Lambda関数を選択します。API名は任意のものを入力し次へをクリックしてください。
@@ -160,6 +179,7 @@ API Gatewayを開き、HTTP APIの構築をクリックします。
 ステージの設定は、そのまま進めて次へをクリックしてください。確認画面が表示されるので、作成をクリックしてください。
 
 ![api-5](./images/api-5.png)
+
 ![api-6](./images/api-6.png)
 
 作成が完了すると、一覧からAPIの詳細を確認できます。ステージセクションにAPIのURLが表示されていますのでメモしておいてください。実際のリクエストするURLはURL + /webhookとなります。
@@ -174,6 +194,7 @@ API Gatewayを開き、HTTP APIの構築をクリックします。
 これでWebhookの設定は完了ですが、まだLINE公式アカウントが自動応答しているので、無効化します。LINE公式アカウント機能の応答メッセージを編集をクリックします。クリックするとLINE Official Account Managerに遷移します。応答設定 > 詳細設定 > 応答メッセージをオフにします。
 
 ![line2-3](./images/line2-3.png)
+
 ![line2-4](./images/line2-4.png)
 
 これで公式アカウントからメッセージを送信すると作成したAPIにリクエストが飛び、処理を実行します。公式アカウントと友だちになるにはLINE Developersコンソール > チャネル > Messaging API設定内に表示されているQRコードをスマートフォンで読み込んでください。

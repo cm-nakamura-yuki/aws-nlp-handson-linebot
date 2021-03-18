@@ -36,7 +36,9 @@ exports.handler = async(event) => {
     const messages = JSON.parse(event.body);
 
     //Validate webhook from LINE Developers
-    if (messages.events[0].replyToken === '00000000000000000000000000000000' || messages.events[0].replyToken === 'ffffffffffffffffffffffffffffffff' ) return { statusCode: 200, body: 'OK'};
+    if (messages.events.length === 0) {
+        return { statusCode: 200, body: 'OK'};
+    }
 
     for (let i = 0; i<messages.events.length; i++) {
         if (messages.events[i].type === 'message') {
